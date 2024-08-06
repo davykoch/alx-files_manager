@@ -5,7 +5,7 @@ class AppController {
   static getStatus(req, res) {
     const status = {
       redis: redisClient.isAlive(),
-      db: dbClient.isAlive()
+      db: dbClient.isAlive(),
     };
     res.status(200).json(status);
   }
@@ -17,10 +17,10 @@ class AppController {
       }
       const usersCount = await dbClient.nbUsers();
       const filesCount = await dbClient.nbFiles();
-      res.status(200).json({ users: usersCount, files: filesCount });
+      return res.status(200).json({ users: usersCount, files: filesCount });
     } catch (error) {
       console.error(error);
-      res.status(500).json({ error: 'Internal Server Error' });
+      return res.status(500).json({ error: 'Internal Server Error' });
     }
   }
 }
