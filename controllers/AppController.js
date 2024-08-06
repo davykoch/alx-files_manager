@@ -12,11 +12,12 @@ class AppController {
 
   static async getStats(req, res) {
     try {
-      const stats = {
-        users: await dbClient.nbUsers(),
-        files: await dbClient.nbFiles()
-      };
-      res.status(200).json(stats);
+      if (!dbClient.isAlive()) {
+        return res.status(500).json({ error: 'Database not connected' });
+      }
+      const usersCount = await dbClient.nbUsers();
+      const filesCount = await dbClient.nbFiles();
+      res.status(200).json({ users: usersCount, files: filesCount });
     } catch (error) {
       console.error(error);
       res.status(500).json({ error: 'Internal Server Error' });

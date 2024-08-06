@@ -10,15 +10,9 @@ class DBClient {
     this.client = new MongoClient(url, { useUnifiedTopology: true });
     this.db = null;
 
-    // Attempt to connect
-    this.connectWithRetry();
-  }
-
-  connectWithRetry() {
     this.client.connect((err) => {
       if (err) {
-        console.error('Failed to connect to MongoDB. Retrying in 5 seconds...');
-        setTimeout(() => this.connectWithRetry(), 5000);
+        console.error('MongoDB connection error:', err);
       } else {
         this.db = this.client.db();
         console.log('Connected to MongoDB');
@@ -27,13 +21,14 @@ class DBClient {
   }
 
   isAlive() {
-    return !!this.client && !!this.db;
+    return !!this.client && !!this.db && this.client.isConnected();
   }
 
   async nbUsers() {
     if (!this.db) return 0;
     try {
-      return await this.db.collection('users').countDocuments();
+      const usersCollection = this.db.collection('users');
+      return await usersCollection.countDocuments();
     } catch (err) {
       console.error('Error counting users:', err);
       return 0;
@@ -43,7 +38,8 @@ class DBClient {
   async nbFiles() {
     if (!this.db) return 0;
     try {
-      return await this.db.collection('files').countDocuments();
+      const filesCollection = this.db.collection('files');
+      return await filesCollection.countDocuments();
     } catch (err) {
       console.error('Error counting files:', err);
       return 0;
