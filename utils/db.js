@@ -9,15 +9,14 @@ class DBClient {
 
     this.client = new MongoClient(url, { useUnifiedTopology: true });
     this.db = null;
+  }
 
-    this.client.connect((err) => {
-      if (err) {
-        console.error('MongoDB connection error:', err);
-      } else {
-        this.db = this.client.db();
-        console.log('Connected to MongoDB');
-      }
-    });
+  async connect() {
+    if (!this.db) {
+      await this.client.connect();
+      this.db = this.client.db();
+      console.log('Connected to MongoDB');
+    }
   }
 
   isAlive() {
