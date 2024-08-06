@@ -5,14 +5,12 @@ class DBClient {
     const host = process.env.DB_HOST || 'localhost';
     const port = process.env.DB_PORT || 27017;
     const database = process.env.DB_DATABASE || 'files_manager';
-    const url = `mongodb://${host}:${port}`;
+    const url = `mongodb://${host}:${port}/${database}`;
 
-    this.client = new MongoClient(url, {
-      useUnifiedTopology: true,
-      useNewUrlParser: true,
-    });
+    this.client = new MongoClient(url, { useUnifiedTopology: true });
     this.db = null;
 
+    // Attempt to connect
     this.connectWithRetry();
   }
 
@@ -22,7 +20,7 @@ class DBClient {
         console.error('Failed to connect to MongoDB. Retrying in 5 seconds...');
         setTimeout(() => this.connectWithRetry(), 5000);
       } else {
-        this.db = this.client.db(process.env.DB_DATABASE || 'files_manager');
+        this.db = this.client.db();
         console.log('Connected to MongoDB');
       }
     });
