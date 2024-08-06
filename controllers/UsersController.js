@@ -19,7 +19,7 @@ class UsersController {
       return res.status(400).json({ error: 'Already exist' });
     }
 
-    // Hash the password
+    // Hash password
     const hashedPassword = sha1(password);
 
     // Create new user
@@ -28,7 +28,7 @@ class UsersController {
       password: hashedPassword,
     });
 
-    // Return the new user
+    // Return new user
     return res.status(201).json({
       id: result.insertedId,
       email,
