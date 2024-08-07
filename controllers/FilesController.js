@@ -3,9 +3,9 @@ import { v4 as uuidv4 } from 'uuid';
 import { ObjectId } from 'mongodb';
 import fs from 'fs';
 import path from 'path';
+import mime from 'mime-types';
 import dbClient from '../utils/db';
 import redisClient from '../utils/redis';
-import mime from 'mime-types';
 
 const FOLDER_PATH = process.env.FOLDER_PATH || '/tmp/files_manager';
 const fileQueue = new Bull('fileQueue');
@@ -66,8 +66,8 @@ class FilesController {
         isPublic: fileDocument.isPublic,
         parentId: fileDocument.parentId,
       });
-	  
     }
+
     const fileUuid = uuidv4();
     const localPath = path.join(FOLDER_PATH, fileUuid);
 
@@ -77,6 +77,14 @@ class FilesController {
     fileDocument.localPath = localPath;
 
     const result = await dbClient.db.collection('files').insertOne(fileDocument);
+
+    if (type === 'image') {
+      await fileQueue.add({
+        userId: userId.toString(),
+        fileId: result.insertedId.toString(),
+      });
+    }
+
     return res.status(201).json({
       id: result.insertedId,
       userId: fileDocument.userId,
@@ -212,7 +220,7 @@ class FilesController {
 
   static async getFile(req, res) {
     const fileId = req.params.id;
-	const size = req.query.size;
+    const size = req.query.size;
     const token = req.headers['x-token'];
 
     const file = await dbClient.db.collection('files').findOne({ _id: ObjectId(fileId) });
@@ -229,16 +237,27 @@ class FilesController {
         return res.status(404).json({ error: 'Not found' });
       }
     }
+
     if (file.type === 'folder') {
       return res.status(400).json({ error: "A folder doesn't have content" });
     }
 
-    if (!fs.existsSync(file.localPath)) {
+    let filePath = file.localPath;
+    if (size) {
+      if (['500', '250', '100'].includes(size)) {
+        filePath = `${file.localPath}_${size}`;
+      } else {
+        return res.status(400).json({ error: 'Invalid size parameter' });
+      }
+    }
+
+    if (!fs.existsSync(filePath)) {
       return res.status(404).json({ error: 'Not found' });
     }
+
     const mimeType = mime.lookup(file.name);
 
-    fs.readFile(file.localPath, (err, data) => {
+    fs.readFile(filePath, (err, data) => {
       if (err) {
         return res.status(500).json({ error: 'Internal server error' });
       }
