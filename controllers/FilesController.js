@@ -19,7 +19,9 @@ class FilesController {
       return res.status(401).json({ error: 'Unauthorized' });
     }
 
-    const { name, type, parentId = 0, isPublic = false, data } = req.body;
+    const {
+      name, type, parentId = 0, isPublic = false, data,
+    } = req.body;
 
     if (!name) {
       return res.status(400).json({ error: 'Missing name' });
@@ -61,25 +63,24 @@ class FilesController {
         isPublic: fileDocument.isPublic,
         parentId: fileDocument.parentId,
       });
-    } else {
-      const fileUuid = uuidv4();
-      const localPath = path.join(FOLDER_PATH, fileUuid);
-
-      await fs.promises.mkdir(FOLDER_PATH, { recursive: true });
-      await fs.promises.writeFile(localPath, Buffer.from(data, 'base64'));
-
-      fileDocument.localPath = localPath;
-
-      const result = await dbClient.db.collection('files').insertOne(fileDocument);
-      return res.status(201).json({
-        id: result.insertedId,
-        userId: fileDocument.userId,
-        name: fileDocument.name,
-        type: fileDocument.type,
-        isPublic: fileDocument.isPublic,
-        parentId: fileDocument.parentId,
-      });
     }
+    const fileUuid = uuidv4();
+    const localPath = path.join(FOLDER_PATH, fileUuid);
+
+    await fs.promises.mkdir(FOLDER_PATH, { recursive: true });
+    await fs.promises.writeFile(localPath, Buffer.from(data, 'base64'));
+
+    fileDocument.localPath = localPath;
+
+    const result = await dbClient.db.collection('files').insertOne(fileDocument);
+    return res.status(201).json({
+      id: result.insertedId,
+      userId: fileDocument.userId,
+      name: fileDocument.name,
+      type: fileDocument.type,
+      isPublic: fileDocument.isPublic,
+      parentId: fileDocument.parentId,
+    });
   }
 
   static async getShow(req, res) {
@@ -118,7 +119,7 @@ class FilesController {
     }
 
     const parentId = req.query.parentId || '0';
-    const page = parseInt(req.query.page) || 0;
+    const page = parseInt(req.query.page, 10) || 0;
     const pageSize = 20;
 
     const pipeline = [
@@ -129,7 +130,7 @@ class FilesController {
 
     const files = await dbClient.db.collection('files').aggregate(pipeline).toArray();
 
-    return res.status(200).json(files.map(file => ({
+    return res.status(200).json(files.map((file) => ({
       id: file._id,
       userId: file.userId,
       name: file.name,
@@ -162,7 +163,7 @@ class FilesController {
 
     await dbClient.db.collection('files').updateOne(
       { _id: ObjectId(fileId) },
-      { $set: { isPublic: true } }
+      { $set: { isPublic: true } },
     );
 
     const updatedFile = await dbClient.db.collection('files').findOne({
@@ -195,7 +196,7 @@ class FilesController {
 
     await dbClient.db.collection('files').updateOne(
       { _id: ObjectId(fileId) },
-      { $set: { isPublic: false } }
+      { $set: { isPublic: false } },
     );
 
     const updatedFile = await dbClient.db.collection('files').findOne({
