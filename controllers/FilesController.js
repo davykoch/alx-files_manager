@@ -1,11 +1,14 @@
+import Bull from 'bull';
 import { v4 as uuidv4 } from 'uuid';
 import { ObjectId } from 'mongodb';
 import fs from 'fs';
 import path from 'path';
 import dbClient from '../utils/db';
 import redisClient from '../utils/redis';
+import mime from 'mime-types';
 
 const FOLDER_PATH = process.env.FOLDER_PATH || '/tmp/files_manager';
+const fileQueue = new Bull('fileQueue');
 
 class FilesController {
   static async postUpload(req, res) {
@@ -63,6 +66,7 @@ class FilesController {
         isPublic: fileDocument.isPublic,
         parentId: fileDocument.parentId,
       });
+	  
     }
     const fileUuid = uuidv4();
     const localPath = path.join(FOLDER_PATH, fileUuid);
@@ -208,6 +212,7 @@ class FilesController {
 
   static async getFile(req, res) {
     const fileId = req.params.id;
+	const size = req.query.size;
     const token = req.headers['x-token'];
 
     const file = await dbClient.db.collection('files').findOne({ _id: ObjectId(fileId) });
