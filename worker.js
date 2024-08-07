@@ -1,10 +1,11 @@
-import Bull from 'bull';
+import Queue from 'bull';
 import { ObjectId } from 'mongodb';
 import imageThumbnail from 'image-thumbnail';
 import fs from 'fs';
 import dbClient from './utils/db';
 
-const fileQueue = new Bull('fileQueue');
+const fileQueue = new Queue('fileQueue');
+const userQueue = new Queue('userQueue');
 
 const generateThumbnail = async (path, options) => {
   try {
@@ -42,6 +43,22 @@ fileQueue.process(async (job) => {
   );
 
   await Promise.all(thumbnailPromises);
+});
+
+userQueue.process(async (job) => {
+  const { userId } = job.data;
+
+  if (!userId) {
+    throw new Error('Missing userId');
+  }
+
+  const user = await dbClient.db.collection('users').findOne({ _id: ObjectId(userId) });
+
+  if (!user) {
+    throw new Error('User not found');
+  }
+
+  console.log(`Welcome ${user.email}!`);
 });
 
 export default fileQueue;
