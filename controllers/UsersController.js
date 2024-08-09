@@ -21,7 +21,7 @@ class UsersController {
 
     const userId = result.insertedId.toString();
 
-    await userQueue.add({ userId });
+    // await userQueue.add({ userId });
 
     return res.status(201).json({ id: userId, email });
   }
