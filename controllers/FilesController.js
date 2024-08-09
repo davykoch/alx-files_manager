@@ -257,12 +257,15 @@ class FilesController {
 
     const mimeType = mime.lookup(file.name);
 
-    fs.readFile(filePath, (err, data) => {
-      if (err) {
-        return res.status(500).json({ error: 'Internal server error' });
-      }
-      res.setHeader('Content-Type', mimeType);
-      return res.send(data);
+    return new Promise((resolve, reject) => {
+      fs.readFile(filePath, (err, data) => {
+        if (err) {
+          reject(res.status(500).json({ error: 'Internal server error' }));
+        } else {
+          res.setHeader('Content-Type', mimeType);
+          resolve(res.send(data));
+        }
+      });
     });
   }
 }
