@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import dbClient from '../utils/db';
 
-describe('DB Client', () => {
+describe('dB Client', () => {
   it('should connect to MongoDB', async () => {
     const isConnected = await dbClient.isAlive();
     expect(isConnected).to.be.true;

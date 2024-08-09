@@ -3,7 +3,7 @@ import { ObjectId } from 'mongodb';
 import app from '../server';
 import dbClient from '../utils/db';
 
-describe('API Endpoints', () => {
+describe('aPI Endpoints', () => {
   let token;
   let userId;
   let fileId;
@@ -14,7 +14,7 @@ describe('API Endpoints', () => {
     await dbClient.db.collection('files').deleteMany({});
   });
 
-  describe('GET /status', () => {
+  describe('gET /status', () => {
     it('should return the status of Redis and DB connections', async () => {
       const res = await request(app).get('/status');
       expect(res.statusCode).toBe(200);
@@ -23,7 +23,7 @@ describe('API Endpoints', () => {
     });
   });
 
-  describe('GET /stats', () => {
+  describe('gET /stats', () => {
     it('should return the number of users and files', async () => {
       const res = await request(app).get('/stats');
       expect(res.statusCode).toBe(200);
@@ -32,7 +32,7 @@ describe('API Endpoints', () => {
     });
   });
 
-  describe('POST /users', () => {
+  describe('pOST /users', () => {
     it('should create a new user', async () => {
       const res = await request(app)
         .post('/users')
@@ -57,7 +57,7 @@ describe('API Endpoints', () => {
     });
   });
 
-  describe('GET /connect', () => {
+  describe('gET /connect', () => {
     it('should authenticate a user and return a token', async () => {
       const res = await request(app)
         .get('/connect')
@@ -76,7 +76,7 @@ describe('API Endpoints', () => {
     });
   });
 
-  describe('GET /disconnect', () => {
+  describe('gET /disconnect', () => {
     it('should disconnect a user', async () => {
       const res = await request(app)
         .get('/disconnect')
@@ -93,7 +93,7 @@ describe('API Endpoints', () => {
     });
   });
 
-  describe('GET /users/me', () => {
+  describe('gET /users/me', () => {
     it('should return the user info', async () => {
       const res = await request(app)
         .get('/users/me')
@@ -112,7 +112,7 @@ describe('API Endpoints', () => {
     });
   });
 
-  describe('POST /files', () => {
+  describe('pOST /files', () => {
     it('should create a new file', async () => {
       const res = await request(app)
         .post('/files')
@@ -141,7 +141,7 @@ describe('API Endpoints', () => {
     });
   });
 
-  describe('GET /files/:id', () => {
+  describe('gET /files/:id', () => {
     it('should return file information', async () => {
       const res = await request(app)
         .get(`/files/${fileId}`)
@@ -160,7 +160,7 @@ describe('API Endpoints', () => {
     });
   });
 
-  describe('GET /files', () => {
+  describe('gET /files', () => {
     it('should return a list of files', async () => {
       const res = await request(app)
         .get('/files')
@@ -179,7 +179,7 @@ describe('API Endpoints', () => {
     });
   });
 
-  describe('PUT /files/:id/publish', () => {
+  describe('pUT /files/:id/publish', () => {
     it('should publish a file', async () => {
       const res = await request(app)
         .put(`/files/${fileId}/publish`)
@@ -189,7 +189,7 @@ describe('API Endpoints', () => {
     });
   });
 
-  describe('PUT /files/:id/unpublish', () => {
+  describe('pUT /files/:id/unpublish', () => {
     it('should unpublish a file', async () => {
       const res = await request(app)
         .put(`/files/${fileId}/unpublish`)
@@ -199,7 +199,7 @@ describe('API Endpoints', () => {
     });
   });
 
-  describe('GET /files/:id/data', () => {
+  describe('gET /files/:id/data', () => {
     it('should return file data', async () => {
       const res = await request(app)
         .get(`/files/${fileId}/data`)

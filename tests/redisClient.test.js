@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import redisClient from '../utils/redis';
 
-describe('Redis Client', () => {
+describe('redis Client', () => {
   it('should connect to Redis', async () => {
     const isConnected = await redisClient.isAlive();
     expect(isConnected).to.be.true;

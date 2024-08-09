@@ -220,7 +220,7 @@ class FilesController {
 
   static async getFile(req, res) {
     const fileId = req.params.id;
-    const size = req.query.size;
+    const { size } = req.query;
     const token = req.headers['x-token'];
 
     const file = await dbClient.db.collection('files').findOne({ _id: ObjectId(fileId) });
